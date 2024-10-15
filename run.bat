@@ -1,0 +1,1 @@
+java -cp ".\out\production\work" EcosystemSimulator "data/data.txt" "data/data1.txt"
