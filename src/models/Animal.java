@@ -23,10 +23,22 @@ public class Animal extends EcosystemObject {
     }
 
     public void decreasePopulation(int foodMissing) {
-        population -= foodMissing / eating;
+        if (population > 0) {
+            population -= foodMissing / eating;
+            System.out.println(name + " популяция уменьшается! Population: " + population);
+        }
     }
 
     public void increasePopulation() {
-        population = population + reproduction;
+        if (population >= 0) {
+            population = population + reproduction;
+            System.out.println(name + " популяция увеличивается! Population: " + population);
+        }
+        // а если меньше то и расти нечему
+
+    }
+
+    public int getPopulation() {
+        return population;
     }
 }

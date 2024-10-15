@@ -75,8 +75,6 @@ public class EcosystemManager {
             if (object instanceof Plant) {
                 Plant plant = (Plant) object;
                 if (temperature < 45 && temperature > 5) {
-                    System.out.println(plant.getName() + " растет!");
-                    // Логика роста
                     plant.grow();
                 } else {
                     System.out.println(plant.getName() + " не может расти из-за неблагоприятных условий.");
@@ -93,15 +91,44 @@ public class EcosystemManager {
                 // реализация по простом
                 int foodAvailable = countFoodAvailable();
                 int foodNeeded = countFoodNeeded();
-                if (foodAvailable < foodNeeded) {
-                    System.out.println(animal.getName() + " популяция уменьшается!");
-                    animal.decreasePopulation(foodNeeded - foodAvailable);
+                // надо уменьшить кол-во еды согласно кол-ву животных
+                //
+                boolean isWellFood = animalEatFood(foodNeeded);
+                if (!isWellFood) {
+                    //сразу все растения сьедают и потом умирают ?
+                    // или какая то другая логика ?
+//                    animal.decreasePopulation(foodNeeded - foodAvailable);
+                    System.out.println(animal.getName() + "съедает всю еду и на следующем шаге умирает в количестве " + animal.getPopulation());
                 } else {
+
                     animal.increasePopulation();
-                    System.out.println(animal.getName() + " популяция увеличивается!");
+
                 }
             }
         }
+    }
+
+    private boolean animalEatFood(int foodEaten) {
+        int foodCount = foodEaten;
+        for (EcosystemObject object : objects) {
+            if (object instanceof Plant) {
+                if (foodCount > 0) {
+                    int weight = ((Plant) object).getWeight();
+                    // экологичное распределение ?
+                    if (weight > foodCount) {
+                        ((Plant) object).setWeight(weight - foodCount);
+                        foodCount = foodCount - weight;
+                    } else {
+
+                        foodCount = foodCount - weight;
+                        ((Plant) object).setWeight(0);
+
+                    }
+
+                }
+            }
+        }
+        return foodCount <= 0;
     }
 
     private int countFoodNeeded() {

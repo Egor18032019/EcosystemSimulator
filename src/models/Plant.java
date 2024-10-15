@@ -18,10 +18,17 @@ public class Plant extends EcosystemObject {
     }
 
     public void grow() {
-        weight = weight + growthRate;// как то так ))
+        if (weight > 0) {
+            weight = weight + growthRate;// примерная логика
+            System.out.println(name + " растет!");
+        }
     }
 
     public int getWeight() {
         return weight;
+    }
+
+    public void setWeight(int newWeight) {
+        weight = newWeight;
     }
 }

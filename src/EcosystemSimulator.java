@@ -22,6 +22,7 @@ public class EcosystemSimulator {
             System.out.println("3. Показать объекты");
             System.out.println("0. Выход");
             System.out.println("5. Запустить симуляцию");
+            //todo добавить  очистить данные
             int choice = scanner.nextInt();
             scanner.nextLine();
 
