@@ -17,11 +17,13 @@ public class EcosystemSimulator {
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
             System.out.println("4. Введите температуру окружающей среды. По умолчанию = 20");
+           //todo добавить в экосистему влажность, количество доступной воды
+
             System.out.println("1. Добавить растение");
             System.out.println("2. Добавить животное");
             System.out.println("3. Показать объекты");
-            System.out.println("0. Выход");
             System.out.println("5. Запустить симуляцию");
+            System.out.println("0. Выход");
             //todo добавить  очистить данные
             int choice = scanner.nextInt();
             scanner.nextLine();
@@ -40,7 +42,7 @@ public class EcosystemSimulator {
                 case 2:
                     System.out.println("Введите имя животного:");
                     String animalName = scanner.nextLine();
-                    System.out.println("Введите популяцию:");
+                    System.out.println("Введите начальную популяцию:");
                     int population = scanner.nextInt();
                     System.out.println("Введите сколько ест за каждый тик:");
                     int eating = scanner.nextInt();
@@ -49,16 +51,15 @@ public class EcosystemSimulator {
                     manager.addObject(new Animal(animalName, population, eating, reproduction));
                     break;
                 case 3:
-                    for (EcosystemObject obj : manager.getObjects()) {
-                        System.out.println(obj);
-                    }
+                    manager.printObjects();
                     break;
                 case 4:
                     System.out.println("Введите имя температуры окружающей среды:");
                     temperature = Integer.parseInt(scanner.nextLine());
-                    //todo отдельный класс для окружающей среды.
+                    //todo отдельный класс для окружающей среды.?
                     break;
                 case 0:
+                    manager.save();
                     return;
                 case 5:
                     System.out.println("Задали условия теперь запускаем симуляцию в цикле на 10 шагов.");
@@ -74,11 +75,15 @@ public class EcosystemSimulator {
     }
 
     private static void runSimulation(EcosystemManager manager, int temperature) {
-        for (int step = 0; step < 10; step++) {
-            // 10 шагов симуляции
+        // 10 шагов симуляции
+        for (int step = 1; step <= 10; step++) {
 // в зависимости от температуры изменяем кол-во животных и растений
 //                температурный коэффициент для животных и растений одинаковый или разный ?
-            manager.simulate(temperature);
+            boolean flag = manager.simulate(temperature);
+            if (!flag) {
+                System.out.println("Симуляция завершена через " + step + " шагов.");
+                return;
+            }
         }
     }
 

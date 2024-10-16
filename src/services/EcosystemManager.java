@@ -4,73 +4,41 @@ package services;
 import models.Animal;
 import models.EcosystemObject;
 import models.Plant;
+import repositories.FileRepositories;
+import repositories.RepositoriesCommon;
 
-import java.io.*;
 import java.util.*;
 
 public class EcosystemManager {
-    private List<EcosystemObject> objects = new ArrayList<>();
-    private String filename;
+    private final List<EcosystemObject> objects = new ArrayList<>();
+
+    RepositoriesCommon fileRepositories;
 
     public EcosystemManager(String filename) {
-        this.filename = "data/" + filename;
-        loadFromFile();
+        fileRepositories = new FileRepositories(objects, filename);
+        fileRepositories.load();
     }
 
     public void addObject(EcosystemObject object) {
         objects.add(object);
-        saveToFile();
+        fileRepositories.save();
     }
 
-    public void saveToFile() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            for (EcosystemObject object : objects) {
-                writer.write(object.toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void loadFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // todo Обдумать
-                if (line.startsWith("Plant")) {
-                    String[] parts = line.split(", ");
-                    String name = parts[0].split(": ")[1];
-                    int growthRate = Integer.parseInt(parts[1].split(": ")[1]);
-//                    Plant: 2, Growth Rate: 3, Weight: 3
-                    int weight = Integer.parseInt(parts[2].split(": ")[1]);
-                    objects.add(new Plant(name, growthRate, weight));
-                } else if (line.startsWith("Animal")) {
-                    String[] parts = line.split(", ");
-                    String name = parts[0].split(": ")[1];
-                    int population = Integer.parseInt(parts[1].split(": ")[1]);
-                    int eating = Integer.parseInt(parts[2].split(": ")[1]);
-                    int reproduction = Integer.parseInt(parts[3].split(": ")[1]);
-                    objects.add(new Animal(name, population, eating, reproduction));
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Файл не найден !");
-            System.out.println("Будет создан новый файл.");
-        }
+    public void save() {
+        fileRepositories.save();
     }
 
     public List<EcosystemObject> getObjects() {
         return objects;
     }
 
-    // todo отдельный класс для сохранения данных и интерфейсы к нему
-    // todo отдельный класс для загрузки данных и интерфейсы к нему
+
     // здесь всё сводиться
-    public void simulate(int temperature) {
+    public boolean simulate(int temperature) {
 
         Random random = new Random();
 
+        boolean isAnimalLive = true;
         for (EcosystemObject object : objects) {
             if (object instanceof Plant) {
                 Plant plant = (Plant) object;
@@ -86,49 +54,58 @@ public class EcosystemManager {
                 }
             } else if (object instanceof Animal) {
                 Animal animal = (Animal) object;
-                // если кол-во еды больше чем употреблять животные то популяция растет
-                // если меньше то кому не достанется те погибнуть
-                // реализация по простом
-                int foodAvailable = countFoodAvailable();
+
                 int foodNeeded = countFoodNeeded();
-                // надо уменьшить кол-во еды согласно кол-ву животных
-                //
-                boolean isWellFood = animalEatFood(foodNeeded);
+
+                boolean isWellFood = animalEatFood(foodNeeded, animal);
                 if (!isWellFood) {
-                    //сразу все растения сьедают и потом умирают ?
-                    // или какая то другая логика ?
-//                    animal.decreasePopulation(foodNeeded - foodAvailable);
-                    System.out.println(animal.getName() + "съедает всю еду и на следующем шаге умирает в количестве " + animal.getPopulation());
+                    animal.decreasePopulation();
+                    isAnimalLive = false;
                 } else {
+
 
                     animal.increasePopulation();
 
                 }
             }
         }
+        // если есть растения, то животные не умирают.
+        return isAnimalLive;
     }
 
-    private boolean animalEatFood(int foodEaten) {
-        int foodCount = foodEaten;
+    private boolean animalEatFood(int foodNeeded, Animal animal) {
+        if (animal.getPopulation() <= 0) {
+            return false;
+        }
+
+        System.out.println("Животным " + animal.getName() + " необходимо " + foodNeeded + " килограмма еды.");
+        int foodCount = foodNeeded;
         for (EcosystemObject object : objects) {
             if (object instanceof Plant) {
                 if (foodCount > 0) {
-                    int weight = ((Plant) object).getWeight();
-                    // экологичное распределение ?
+                    Plant plant = (Plant) object;
+                    int weight = plant.getWeight();
+                    // рандомно потребление сортов ?
+                    // может ли растение остаться в живых, а животное не наелось ?
                     if (weight > foodCount) {
-                        ((Plant) object).setWeight(weight - foodCount);
+                        plant.setWeight(weight - foodCount);
+                        System.out.println(animal.getName() + " съел " + foodCount + " килограммов " + plant.getName());
                         foodCount = foodCount - weight;
                     } else {
-
                         foodCount = foodCount - weight;
+                        System.out.println(animal.getName() + " съел " + plant.getWeight() + " килограммов " + plant.getName());
                         ((Plant) object).setWeight(0);
-
                     }
-
                 }
             }
         }
-        return foodCount <= 0;
+        boolean isWellFood = foodCount <= 0;
+        if (isWellFood) {
+            System.out.println("Животные " + animal.getName() + " наелись.");
+        } else {
+            System.out.println("Животные " + animal.getName() + " не хватают еды.");
+        }
+        return isWellFood;
     }
 
     private int countFoodNeeded() {
@@ -149,5 +126,11 @@ public class EcosystemManager {
             }
         }
         return foodCount;
+    }
+
+    public void printObjects() {
+        for (EcosystemObject obj : objects) {
+            System.out.println(obj);
+        }
     }
 }

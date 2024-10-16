@@ -3,8 +3,8 @@ package models;
 //животные = имя + скорость поедания(зависит от температуры?) + скорость размножения(зависит от температуры?)
 public class Animal extends EcosystemObject {
     private int population;
-    private int eating;// сколько ест за каждый тик
-    private int reproduction;// сколько размножается за каждый тик
+    private final int eating;// сколько ест за каждый тик
+    private final int reproduction;// сколько размножается за каждый тик
 
     public Animal(String name, int population, int eating, int reproduction) {
         super(name);
@@ -22,10 +22,13 @@ public class Animal extends EcosystemObject {
         return population * eating;
     }
 
-    public void decreasePopulation(int foodMissing) {
+    public void decreasePopulation() {
+        //сразу все растения съедают и потом все сразу умирают ? или потихоньку умирают?
+        // или какая-то другая логика ?
+        // или умирает часть животных, что бы популяция осталась ?
         if (population > 0) {
-            population -= foodMissing / eating;
-            System.out.println(name + " популяция уменьшается! Population: " + population);
+            System.out.println("Погибло от голода " + population + " " + name);
+            population = 0;
         }
     }
 
