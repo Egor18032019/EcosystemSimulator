@@ -11,17 +11,17 @@ public class EcosystemSimulator {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите имя файла для симуляции:");
         String filename = scanner.nextLine();
-
         EcosystemManager manager = new EcosystemManager(filename);
+
 
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
-            System.out.println("4. Введите температуру окружающей среды. По умолчанию = 20");
-           //todo добавить в экосистему влажность, количество доступной воды
 
             System.out.println("1. Добавить растение");
             System.out.println("2. Добавить животное");
             System.out.println("3. Показать объекты");
+            System.out.println("4. Введите температуру окружающей среды. По умолчанию = 20");
+            //todo добавить в экосистему влажность, количество доступной воды
             System.out.println("5. Запустить симуляцию");
             System.out.println("0. Выход");
             //todo добавить  очистить данные
@@ -65,9 +65,9 @@ public class EcosystemSimulator {
                     System.out.println("Задали условия теперь запускаем симуляцию в цикле на 10 шагов.");
                     runSimulation(manager, temperature);
                     break;
-                default:    // если введен неверный вариант
+                default:
                     System.out.println("Неверный выбор. Попробуйте еще раз.");
-                    break;// выходим из цикла
+                    break;
             }
 
 

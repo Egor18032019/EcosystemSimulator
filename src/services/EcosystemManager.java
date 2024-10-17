@@ -9,6 +9,7 @@ import repositories.RepositoriesCommon;
 
 import java.util.*;
 
+//todo создать интерфейс
 public class EcosystemManager {
     private final List<EcosystemObject> objects = new ArrayList<>();
 
@@ -17,11 +18,12 @@ public class EcosystemManager {
     public EcosystemManager(String filename) {
         fileRepositories = new FileRepositories(objects, filename);
         fileRepositories.load();
+
     }
 
     public void addObject(EcosystemObject object) {
         objects.add(object);
-        fileRepositories.save();
+        save();
     }
 
     public void save() {
@@ -35,7 +37,7 @@ public class EcosystemManager {
 
     // здесь всё сводиться
     public boolean simulate(int temperature) {
-
+        fileRepositories.log("Запущена симуляция для " + objects.size() + " объектов.");
         Random random = new Random();
 
         boolean isAnimalLive = true;
@@ -43,14 +45,21 @@ public class EcosystemManager {
             if (object instanceof Plant) {
                 Plant plant = (Plant) object;
                 if (temperature < 45 && temperature > 5) {
-                    plant.grow();
+                    plant.increaseWeight();
                 } else {
-                    System.out.println(plant.getName() + " не может расти из-за неблагоприятных условий.");
+                    String message = "Неблагоприятные условия для роста растения " + plant.getName();
+                    System.out.println(message);
+                    fileRepositories.log(message);
                     if (temperature < 5) {
-                        System.out.println(plant.getName() + "Растения погибают!");
-                        // уменьшается удельная масса
+                        message = plant.getName() + " вес уменьшен до" + plant.getWeight();
+                        System.out.println(message);
+                        plant.decreaseWeight();
+                        fileRepositories.log(message);
+                    } else {
+                        message = plant.getName() + " не может расти из-за неблагоприятных условий.";
+                        System.out.println(message);
+                        fileRepositories.log(message);
                     }
-
                 }
             } else if (object instanceof Animal) {
                 Animal animal = (Animal) object;
@@ -60,12 +69,11 @@ public class EcosystemManager {
                 boolean isWellFood = animalEatFood(foodNeeded, animal);
                 if (!isWellFood) {
                     animal.decreasePopulation();
+                    fileRepositories.log("Животные " + animal.getName() + " умерли.");
                     isAnimalLive = false;
                 } else {
-
-
+                    fileRepositories.log("Популяция животных " + animal.getName() + " увеличена.");
                     animal.increasePopulation();
-
                 }
             }
         }
@@ -85,15 +93,22 @@ public class EcosystemManager {
                 if (foodCount > 0) {
                     Plant plant = (Plant) object;
                     int weight = plant.getWeight();
+                    if (weight ==0) {
+                        continue;
+                    }
                     // рандомно потребление сортов ?
                     // может ли растение остаться в живых, а животное не наелось ?
                     if (weight > foodCount) {
                         plant.setWeight(weight - foodCount);
-                        System.out.println(animal.getName() + " съел " + foodCount + " килограммов " + plant.getName());
+                        String message = animal.getName() + " съел " + foodCount + " килограммов " + plant.getName();
+                        System.out.println(message);
+                        fileRepositories.log(message);
                         foodCount = foodCount - weight;
                     } else {
                         foodCount = foodCount - weight;
-                        System.out.println(animal.getName() + " съел " + plant.getWeight() + " килограммов " + plant.getName());
+                        String message = animal.getName() + " съел " + plant.getWeight() + " килограммов " + plant.getName();
+                        System.out.println(message);
+                        fileRepositories.log(message);
                         ((Plant) object).setWeight(0);
                     }
                 }
@@ -101,9 +116,13 @@ public class EcosystemManager {
         }
         boolean isWellFood = foodCount <= 0;
         if (isWellFood) {
-            System.out.println("Животные " + animal.getName() + " наелись.");
+            String message = "Животные " + animal.getName() + " наелись.";
+            System.out.println(message);
+            fileRepositories.log(message);
         } else {
-            System.out.println("Животные " + animal.getName() + " не хватают еды.");
+            String message = "Для животных " + animal.getName() + " не хватает еды.";
+            System.out.println(message);
+            fileRepositories.log(message);
         }
         return isWellFood;
     }

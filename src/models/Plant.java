@@ -17,7 +17,7 @@ public class Plant extends EcosystemObject {
         return "Plant: " + name + ", Growth Rate: " + growthRate + ", Weight: " + weight;
     }
 
-    public void grow() {
+    public void increaseWeight() {
         if (weight > 0) {
             weight = weight + growthRate;// примерная логика
             System.out.println(name + " растет! Вес составляет " + weight + " кг");
@@ -30,5 +30,12 @@ public class Plant extends EcosystemObject {
 
     public void setWeight(int newWeight) {
         weight = newWeight;
+    }
+
+    public void decreaseWeight() {
+        if (weight > 0) {
+            weight = weight - growthRate;
+            System.out.println(name + " уменьшается! Вес составляет " + weight + " кг");
+        }
     }
 }
