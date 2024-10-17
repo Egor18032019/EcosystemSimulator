@@ -1,3 +1,5 @@
 #!/bin/bash
-javac *.java
+cd src/
+ls
+javac EcosystemSimulator.java
 java EcosystemSimulator
