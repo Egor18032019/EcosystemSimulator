@@ -1,9 +1,14 @@
 package repositories;
 
 public interface RepositoriesCommon {
-    public void save();
+    public void create();
 
-    public void load();
+    public void read();
+
+    public void update();
+
+    public void delete();
+
 
     public void log(String message);
 }

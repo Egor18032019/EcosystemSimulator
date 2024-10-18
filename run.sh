@@ -1,5 +1,3 @@
 #!/bin/bash
-cd src/
-ls
-javac EcosystemSimulator.java
-java EcosystemSimulator
+javac  -cp src src/EcosystemSimulator.java
+java -cp src EcosystemSimulator

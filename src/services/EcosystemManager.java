@@ -10,31 +10,37 @@ import repositories.RepositoriesCommon;
 import java.util.*;
 
 //todo создать интерфейс
-public class EcosystemManager {
+public class EcosystemManager implements ManagerCommon {
     private final List<EcosystemObject> objects = new ArrayList<>();
 
     RepositoriesCommon fileRepositories;
 
     public EcosystemManager(String filename) {
         fileRepositories = new FileRepositories(objects, filename);
-        fileRepositories.load();
+        fileRepositories.read();
 
     }
 
+    @Override
     public void addObject(EcosystemObject object) {
         objects.add(object);
         save();
     }
 
+    @Override
     public void save() {
-        fileRepositories.save();
+        fileRepositories.create();
     }
-
+    @Override
+    public void update() {
+        fileRepositories.update();
+    }
+    @Override
     public List<EcosystemObject> getObjects() {
         return objects;
     }
 
-
+    @Override
     // здесь всё сводиться
     public boolean simulate(int temperature) {
         fileRepositories.log("Запущена симуляция для " + objects.size() + " объектов.");
@@ -93,7 +99,7 @@ public class EcosystemManager {
                 if (foodCount > 0) {
                     Plant plant = (Plant) object;
                     int weight = plant.getWeight();
-                    if (weight ==0) {
+                    if (weight == 0) {
                         continue;
                     }
                     // рандомно потребление сортов ?
@@ -147,6 +153,7 @@ public class EcosystemManager {
         return foodCount;
     }
 
+    @Override
     public void printObjects() {
         for (EcosystemObject obj : objects) {
             System.out.println(obj);

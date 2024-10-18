@@ -1,7 +1,7 @@
 import models.Animal;
-import models.EcosystemObject;
 import models.Plant;
 import services.EcosystemManager;
+import services.ManagerCommon;
 
 import java.util.Scanner;
 
@@ -11,8 +11,7 @@ public class EcosystemSimulator {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите имя файла для симуляции:");
         String filename = scanner.nextLine();
-        EcosystemManager manager = new EcosystemManager(filename);
-
+        ManagerCommon manager = new EcosystemManager(filename);
 
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
@@ -59,7 +58,7 @@ public class EcosystemSimulator {
                     //todo отдельный класс для окружающей среды.?
                     break;
                 case 0:
-                    manager.save();
+                    manager.update();
                     return;
                 case 5:
                     System.out.println("Задали условия теперь запускаем симуляцию в цикле на 10 шагов.");
@@ -74,7 +73,7 @@ public class EcosystemSimulator {
         }
     }
 
-    private static void runSimulation(EcosystemManager manager, int temperature) {
+    private static void runSimulation(ManagerCommon manager, int temperature) {
         // 10 шагов симуляции
         for (int step = 1; step <= 10; step++) {
 // в зависимости от температуры изменяем кол-во животных и растений

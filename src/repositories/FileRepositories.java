@@ -20,7 +20,7 @@ public class FileRepositories implements RepositoriesCommon {
     }
 
     @Override
-    public void save() {
+    public void create() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FileName))) {
             for (EcosystemObject object : Objects) {
                 writer.write(object.toString());
@@ -35,7 +35,7 @@ public class FileRepositories implements RepositoriesCommon {
     }
 
     @Override
-    public void load() {
+    public void read() {
         try (BufferedReader reader = new BufferedReader(new FileReader(FileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -62,6 +62,16 @@ public class FileRepositories implements RepositoriesCommon {
             System.out.println("Будет создан новый файл.");
             log("Создали новый файл для сохранения данных симуляции.");
         }
+    }
+
+    @Override
+    public void update() {
+        System.out.println("сделай");
+    }
+
+    @Override
+    public void delete() {
+
     }
 
     @Override

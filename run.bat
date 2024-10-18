@@ -1,1 +1,4 @@
-java -cp "out/production/work/" EcosystemSimulator
+@echo off
+cd src/
+javac EcosystemSimulator.java
+java EcosystemSimulator
