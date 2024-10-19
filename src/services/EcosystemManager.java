@@ -1,5 +1,4 @@
 package services;
-//Управление данными
 
 import logging.Logger;
 import logging.LoggerCommon;
@@ -8,7 +7,6 @@ import models.EcosystemObject;
 import models.Plant;
 import repositories.FileRepositories;
 import repositories.RepositoriesCommon;
-
 import java.util.*;
 
 public class EcosystemManager implements ManagerCommon {
@@ -28,14 +26,12 @@ public class EcosystemManager implements ManagerCommon {
         fileRepositories.update(object);
     }
 
-
     @Override
     public List<EcosystemObject> getObjects() {
         return objects;
     }
 
     @Override
-    // здесь всё сводиться
     public boolean simulate(int temperature) {
         boolean isAnimalLive = true;
         for (EcosystemObject object : objects) {
@@ -72,7 +68,6 @@ public class EcosystemManager implements ManagerCommon {
                 }
             }
         }
-        // если есть растения, то животные не умирают.
         return isAnimalLive;
     }
 
