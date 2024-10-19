@@ -1,96 +1,85 @@
 package repositories;
 
+import logging.Logger;
 import models.Animal;
 import models.EcosystemObject;
 import models.Plant;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class FileRepositories implements RepositoriesCommon {
-
-    private final List<EcosystemObject> Objects;
     private final String FileName;
+    private static final Logger logger = Logger.getLogger();
 
-    public FileRepositories(List<EcosystemObject> objects, String FileName) {
-        this.Objects = objects;
-        this.FileName = "data/" + FileName + ".txt";
+    public FileRepositories(String fileName) {
+        this.FileName = "data/" + fileName + ".txt";
+
     }
 
     @Override
-    public void create() {
+    public void create(List<EcosystemObject> objects) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FileName))) {
-            for (EcosystemObject object : Objects) {
+            for (EcosystemObject object : objects) {
                 writer.write(object.toString());
                 writer.newLine();
             }
-            log("Cохранение в файл прошло успешно.Всего объектов: " + Objects.size());
+            logger.log("Файл для хранения данных: " + FileName);
         } catch (IOException e) {
-            System.out.println("Ошибка при сохранении файла.");
-            log("Ошибка при сохранении файла.");
-            log(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+            System.out.println("Ошибка при создании файла.");
+            logger.log("Ошибка при создании файла.");
+            logger.log(e.getMessage());
         }
     }
 
     @Override
-    public void read() {
+    public List<EcosystemObject> read() {
+        List<EcosystemObject> objects = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(FileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // todo Обдумать
                 if (line.startsWith("Plant")) {
                     String[] parts = line.split(", ");
                     String name = parts[0].split(": ")[1];
                     int growthRate = Integer.parseInt(parts[1].split(": ")[1]);
 //                    Plant: 2, Growth Rate: 3, Weight: 3
                     int weight = Integer.parseInt(parts[2].split(": ")[1]);
-                    Objects.add(new Plant(name, growthRate, weight));
+                    objects.add(new Plant(name, growthRate, weight));
                 } else if (line.startsWith("Animal")) {
                     String[] parts = line.split(", ");
                     String name = parts[0].split(": ")[1];
                     int population = Integer.parseInt(parts[1].split(": ")[1]);
                     int eating = Integer.parseInt(parts[2].split(": ")[1]);
                     int reproduction = Integer.parseInt(parts[3].split(": ")[1]);
-                    Objects.add(new Animal(name, population, eating, reproduction));
+                    objects.add(new Animal(name, population, eating, reproduction));
                 }
-                log("Выгрузили данные симуляции из файла. Всего объектов: " + Objects.size());
             }
+            logger.log("Выгрузили данные симуляции из файла. Всего объектов: " + objects.size());
         } catch (IOException e) {
-            System.out.println("Файл не найден !");
-            System.out.println("Будет создан новый файл.");
-            log("Создали новый файл для сохранения данных симуляции.");
+            String message = "При попытки выгрузки данных симуляции из файла " + FileName + " произошла ошибка " + e.getMessage() + ".";
+            logger.log(message);
+            logger.log("Будет возращен пустой список данных.");
         }
+        return objects;
     }
 
     @Override
-    public void update() {
-        System.out.println("сделай");
-    }
-
-    @Override
-    public void delete() {
-
-    }
-
-    @Override
-    public void log(String message) {
-//todo уровни логирования ?
-        File file = new File(FileName + ".log");
+    public void update(EcosystemObject object) {
+        File file = new File(FileName);
 
         if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException("Ошибка создания файла", e);
-            }
+            String message = "Не найден файл для сохранения данных симуляции!";
+            System.out.println(message);
+            logger.log(message);
         }
 
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), StandardCharsets.UTF_8));
-            writer.write(message + System.lineSeparator());
+            writer.write(object.toString() + System.lineSeparator());
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException("Ошибка открытия файла", e);
@@ -104,4 +93,28 @@ public class FileRepositories implements RepositoriesCommon {
             }
         }
     }
+
+    @Override
+    public void delete() {
+        File fileToDelete = new File(FileName);
+
+        // Проверяем ли то что существует ли файл ?
+        if (!fileToDelete.exists()) {
+            System.out.println("Файл не найден.");
+            logger.log("Файл не найден.");
+            return;
+        }
+
+        // Удаляем файл
+        boolean deleted = fileToDelete.delete();
+        if (deleted) {
+            logger.log("Файл успешно удален.");
+            System.out.println("Файл успешно удален.");
+        } else {
+            logger.log(String.format("Ошибка при удалении файла: %s", fileToDelete.getAbsolutePath()));
+            System.out.println("Ошибка при попытке удаления файла.");
+        }
+    }
+
+
 }

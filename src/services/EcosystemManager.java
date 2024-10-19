@@ -1,6 +1,8 @@
 package services;
 //Управление данными
 
+import logging.Logger;
+import logging.LoggerCommon;
 import models.Animal;
 import models.EcosystemObject;
 import models.Plant;
@@ -9,32 +11,24 @@ import repositories.RepositoriesCommon;
 
 import java.util.*;
 
-//todo создать интерфейс
 public class EcosystemManager implements ManagerCommon {
-    private final List<EcosystemObject> objects = new ArrayList<>();
-
-    RepositoriesCommon fileRepositories;
+    private final List<EcosystemObject> objects;
+    private final RepositoriesCommon fileRepositories;
+    LoggerCommon logger = Logger.getLogger();
 
     public EcosystemManager(String filename) {
-        fileRepositories = new FileRepositories(objects, filename);
-        fileRepositories.read();
-
+        fileRepositories = new FileRepositories(filename);
+        objects = fileRepositories.read();
+        fileRepositories.create(objects);
     }
 
     @Override
-    public void addObject(EcosystemObject object) {
+    public void update(EcosystemObject object) {
         objects.add(object);
-        save();
+        fileRepositories.update(object);
     }
 
-    @Override
-    public void save() {
-        fileRepositories.create();
-    }
-    @Override
-    public void update() {
-        fileRepositories.update();
-    }
+
     @Override
     public List<EcosystemObject> getObjects() {
         return objects;
@@ -43,42 +37,37 @@ public class EcosystemManager implements ManagerCommon {
     @Override
     // здесь всё сводиться
     public boolean simulate(int temperature) {
-        fileRepositories.log("Запущена симуляция для " + objects.size() + " объектов.");
-        Random random = new Random();
-
         boolean isAnimalLive = true;
         for (EcosystemObject object : objects) {
-            if (object instanceof Plant) {
-                Plant plant = (Plant) object;
+            if (object instanceof Plant plant) {
                 if (temperature < 45 && temperature > 5) {
                     plant.increaseWeight();
                 } else {
-                    String message = "Неблагоприятные условия для роста растения " + plant.getName();
+                    String message = "Неблагоприятные условия для роста растения при температуре " + temperature + ".";
                     System.out.println(message);
-                    fileRepositories.log(message);
+                    logger.log(message);
                     if (temperature < 5) {
                         message = plant.getName() + " вес уменьшен до" + plant.getWeight();
                         System.out.println(message);
+                        logger.log(message);
                         plant.decreaseWeight();
-                        fileRepositories.log(message);
                     } else {
                         message = plant.getName() + " не может расти из-за неблагоприятных условий.";
                         System.out.println(message);
-                        fileRepositories.log(message);
+                        logger.log(message);
                     }
                 }
-            } else if (object instanceof Animal) {
-                Animal animal = (Animal) object;
+            } else if (object instanceof Animal animal) {
 
                 int foodNeeded = countFoodNeeded();
 
                 boolean isWellFood = animalEatFood(foodNeeded, animal);
                 if (!isWellFood) {
                     animal.decreasePopulation();
-                    fileRepositories.log("Животные " + animal.getName() + " умерли.");
+                    logger.log("Животные " + animal.getName() + " умерли.");
                     isAnimalLive = false;
                 } else {
-                    fileRepositories.log("Популяция животных " + animal.getName() + " увеличена.");
+                    logger.log("Популяция животных " + animal.getName() + " увеличена.");
                     animal.increasePopulation();
                 }
             }
@@ -89,9 +78,9 @@ public class EcosystemManager implements ManagerCommon {
 
     private boolean animalEatFood(int foodNeeded, Animal animal) {
         if (animal.getPopulation() <= 0) {
-            return false;
+            return true;
         }
-
+        Random random = new Random();
         System.out.println("Животным " + animal.getName() + " необходимо " + foodNeeded + " килограмма еды.");
         int foodCount = foodNeeded;
         for (EcosystemObject object : objects) {
@@ -108,13 +97,13 @@ public class EcosystemManager implements ManagerCommon {
                         plant.setWeight(weight - foodCount);
                         String message = animal.getName() + " съел " + foodCount + " килограммов " + plant.getName();
                         System.out.println(message);
-                        fileRepositories.log(message);
+                        logger.log(message);
                         foodCount = foodCount - weight;
                     } else {
                         foodCount = foodCount - weight;
                         String message = animal.getName() + " съел " + plant.getWeight() + " килограммов " + plant.getName();
                         System.out.println(message);
-                        fileRepositories.log(message);
+                        logger.log(message);
                         ((Plant) object).setWeight(0);
                     }
                 }
@@ -124,11 +113,11 @@ public class EcosystemManager implements ManagerCommon {
         if (isWellFood) {
             String message = "Животные " + animal.getName() + " наелись.";
             System.out.println(message);
-            fileRepositories.log(message);
+            logger.log(message);
         } else {
             String message = "Для животных " + animal.getName() + " не хватает еды.";
             System.out.println(message);
-            fileRepositories.log(message);
+            logger.log(message);
         }
         return isWellFood;
     }
@@ -158,5 +147,10 @@ public class EcosystemManager implements ManagerCommon {
         for (EcosystemObject obj : objects) {
             System.out.println(obj);
         }
+    }
+
+    @Override
+    public void save() {
+        fileRepositories.create(objects);
     }
 }

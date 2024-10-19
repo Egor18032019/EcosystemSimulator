@@ -1,14 +1,21 @@
 package repositories;
 
+import models.EcosystemObject;
+
+import java.util.List;
+
 public interface RepositoriesCommon {
-    public void create();
-
-    public void read();
-
-    public void update();
-
-    public void delete();
 
 
-    public void log(String message);
+    void create(List<EcosystemObject> objects);
+
+    List<EcosystemObject> read();
+
+
+
+    void update(EcosystemObject object);
+
+    void delete();
+
+
 }
