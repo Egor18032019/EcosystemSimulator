@@ -1,5 +1,7 @@
 package models;
 
+import utils.Const;
+
 // + растения = имя + скорость роста
 public class Plant extends EcosystemObject {
     private int growthRate;
@@ -17,10 +19,10 @@ public class Plant extends EcosystemObject {
         return "Plant: " + name + ", Growth Rate: " + growthRate + ", Weight: " + weight;
     }
 
-    public void increaseWeight() {
+    public void increaseWeight(int humidity) {
         if (weight > 0) {
-            weight = weight + growthRate;// примерная логика
-            System.out.println(name + " растет! Вес составляет " + weight + " кг");
+            weight = weight + growthRate * humidity;// примерная логика
+            System.out.println(name + " растет! Вес составляет " + weight + " кг.");
         }
     }
 
@@ -32,10 +34,15 @@ public class Plant extends EcosystemObject {
         weight = newWeight;
     }
 
-    public void decreaseWeight() {
+    public void decreaseWeight(int humidity) {
         if (weight > 0) {
-            weight = weight - growthRate;
-            System.out.println(name + " уменьшается! Вес составляет " + weight + " кг");
+            if (humidity >= Const.DEFAULT_HUMIDITY) {
+                weight = weight - growthRate;
+                System.out.println(name + " уменьшается! Вес составляет " + weight + " кг");
+            } else {
+                weight = weight - growthRate * humidity;
+                System.out.println(name + " уменьшается! Вес составляет " + weight + " кг");
+            }
         }
     }
 }

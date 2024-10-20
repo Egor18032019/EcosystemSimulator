@@ -4,20 +4,35 @@ import logging.Logger;
 import logging.LoggerCommon;
 import models.Animal;
 import models.EcosystemObject;
+import models.NaturalEnvironment;
 import models.Plant;
 import repositories.FileRepositories;
 import repositories.RepositoriesCommon;
+
 import java.util.*;
 
 public class EcosystemManager implements ManagerCommon {
     private final List<EcosystemObject> objects;
     private final RepositoriesCommon fileRepositories;
     LoggerCommon logger = Logger.getLogger();
+    NaturalEnvironment naturalEnvironment;
 
     public EcosystemManager(String filename) {
         fileRepositories = new FileRepositories(filename);
+
         objects = fileRepositories.read();
-        fileRepositories.create(objects);
+        if (objects.isEmpty()) {
+            naturalEnvironment = new NaturalEnvironment();
+            objects.add(naturalEnvironment);
+        } else {
+            // в аксиоме мы должны быть уверены,  
+            //  что самый первый элемент в списке это Условия окружающей среды.
+            naturalEnvironment = (NaturalEnvironment) objects.getFirst();
+        }
+    }
+
+    public NaturalEnvironment getNaturalEnvironment() {
+        return naturalEnvironment;
     }
 
     @Override
@@ -32,50 +47,74 @@ public class EcosystemManager implements ManagerCommon {
     }
 
     @Override
-    public boolean simulate(int temperature) {
+    public boolean simulate(NaturalEnvironment naturalEnvironment) {
         boolean isAnimalLive = true;
         for (EcosystemObject object : objects) {
             if (object instanceof Plant plant) {
-                if (temperature < 45 && temperature > 5) {
-                    plant.increaseWeight();
-                } else {
-                    String message = "Неблагоприятные условия для роста растения при температуре " + temperature + ".";
-                    System.out.println(message);
-                    logger.log(message);
-                    if (temperature < 5) {
-                        message = plant.getName() + " вес уменьшен до" + plant.getWeight();
-                        System.out.println(message);
-                        logger.log(message);
-                        plant.decreaseWeight();
-                    } else {
-                        message = plant.getName() + " не может расти из-за неблагоприятных условий.";
-                        System.out.println(message);
-                        logger.log(message);
-                    }
-                }
+
+                simulateForPlant(naturalEnvironment, plant);
+
             } else if (object instanceof Animal animal) {
-
-                int foodNeeded = countFoodNeeded();
-
-                boolean isWellFood = animalEatFood(foodNeeded, animal);
-                if (!isWellFood) {
-                    animal.decreasePopulation();
-                    logger.log("Животные " + animal.getName() + " умерли.");
-                    isAnimalLive = false;
-                } else {
-                    logger.log("Популяция животных " + animal.getName() + " увеличена.");
-                    animal.increasePopulation();
-                }
+                simulateForAnimal(naturalEnvironment, animal);
             }
         }
         return isAnimalLive;
     }
 
-    private boolean animalEatFood(int foodNeeded, Animal animal) {
+    private void simulateForAnimal(NaturalEnvironment naturalEnvironment, Animal animal) {
+        int foodNeeded = countFoodNeeded();
+        int temperature = naturalEnvironment.getTemperature();
+        int water = naturalEnvironment.getWaterAvailable();
+        boolean isWellFood = animalEatFoodAndDrinkWater(foodNeeded, animal, naturalEnvironment);
+        if (!isWellFood) {
+            animal.decreasePopulation();
+
+        } else {
+            animal.increasePopulation(temperature, water);
+        }
+    }
+
+    private void simulateForPlant(NaturalEnvironment naturalEnvironment, Plant plant) {
+        int temperature = naturalEnvironment.getTemperature();
+        int humidity = naturalEnvironment.getHumidity();
+        //todo растения потребляют воду.
+        if (temperature < 45 && temperature > 5) {
+            plant.increaseWeight(humidity);
+        } else {
+            String message = "Неблагоприятные условия для роста растения при температуре " + temperature + ".";
+            System.out.println(message);
+            logger.log(message);
+            if (temperature < 5) {
+                message = plant.getName() + " вес уменьшен до" + plant.getWeight();
+                System.out.println(message);
+                logger.log(message);
+                plant.decreaseWeight(humidity);
+            } else {
+                message = plant.getName() + " не может расти из-за неблагоприятных условий.";
+                System.out.println(message);
+                logger.log(message);
+            }
+        }
+    }
+
+    private boolean animalEatFoodAndDrinkWater(int foodNeeded, Animal animal, NaturalEnvironment naturalEnvironment) {
+
         if (animal.getPopulation() <= 0) {
             return true;
         }
-        Random random = new Random();
+        // животные пьют воду по одной единицы на голову.
+        // рост животных зависит от воды.
+        int waterNeeded = animal.getPopulation();
+        if (naturalEnvironment.getWaterAvailable() < waterNeeded) {
+            String message = "Недостаточно воды для животных " + animal.getName() + ".";
+            logger.log(message);
+            System.out.println(message);
+            naturalEnvironment.setWaterAvailable(0);
+        } else {
+            naturalEnvironment.setWaterAvailable(naturalEnvironment.getWaterAvailable() - animal.getPopulation());
+        }
+
+        // оставшиеся едят растение.
         System.out.println("Животным " + animal.getName() + " необходимо " + foodNeeded + " килограмма еды.");
         int foodCount = foodNeeded;
         for (EcosystemObject object : objects) {

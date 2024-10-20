@@ -1,6 +1,7 @@
 import logging.Logger;
 import logging.LoggerCommon;
 import models.Animal;
+import models.NaturalEnvironment;
 import models.Plant;
 import services.EcosystemManager;
 import services.ManagerCommon;
@@ -10,22 +11,23 @@ import java.util.Scanner;
 
 public class EcosystemSimulator {
     public static void main(String[] args) {
-        int temperature = Const.DEFAULT_TEMPERATURE;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Введите имя файла для симуляции:");
         String filename = scanner.nextLine();
         LoggerCommon logger = Logger.getLogger();
         logger.setFileName(filename);
         ManagerCommon manager = new EcosystemManager(filename);
+        NaturalEnvironment naturalEnvironment = manager.getNaturalEnvironment();
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
 
             System.out.println("1. Добавить растение");
             System.out.println("2. Добавить животное");
             System.out.println("3. Показать объекты");
-            System.out.println("4. Введите температуру окружающей среды. По умолчанию = " + temperature);
-            //todo добавить в экосистему влажность, количество доступной воды
-            System.out.println("5. Запустить симуляцию");
+            System.out.println("4. Ввести температуру окружающей среды");
+            System.out.println("5. Ввести влажность окружающей среды");
+            System.out.println("6. Ввести кол-во доступной воды");
+            System.out.println("7. Запустить симуляцию");
             System.out.println("0. Выход");
             //todo добавить  очистить данные
             int choice = scanner.nextInt();
@@ -56,15 +58,22 @@ public class EcosystemSimulator {
                     manager.printObjects();
                     break;
                 case 4:
-                    System.out.println("Введите имя температуры окружающей среды:");
-                    temperature = Integer.parseInt(scanner.nextLine());
-                    //todo отдельный класс для окружающей среды.?
+                    System.out.println("Введите температуру окружающей среды:");
+                    naturalEnvironment.setTemperature(Integer.parseInt(scanner.nextLine()));
+                    break;
+                case 5:
+                    System.out.println("Введите влажность окружающей среды:");
+                    naturalEnvironment.setHumidity(Integer.parseInt(scanner.nextLine()));
+                    break;
+                case 6:
+                    System.out.println("Введите кол-во доступной воды:");
+                    naturalEnvironment.setWaterAvailable(Integer.parseInt(scanner.nextLine()));
                     break;
                 case 0:
                     manager.save();
                     return;
-                case 5:
-                    runSimulation(manager, temperature, logger);
+                case 7:
+                    runSimulation(manager, naturalEnvironment, logger);
                     break;
                 default:
                     System.out.println("Неверный выбор. Попробуйте еще раз.");
@@ -75,7 +84,7 @@ public class EcosystemSimulator {
         }
     }
 
-    private static void runSimulation(ManagerCommon manager, int temperature, LoggerCommon logger) {
+    private static void runSimulation(ManagerCommon manager, NaturalEnvironment naturalEnvironment, LoggerCommon logger) {
         String message = "Задали условия теперь запускаем симуляцию в цикле на 10 шагов.";
         System.out.println(message);
         logger.log(message);
@@ -88,7 +97,7 @@ public class EcosystemSimulator {
 //                температурный коэффициент для животных и растений одинаковый или разный ?
             message = "Шаг симуляции: " + step;
             logger.log(message);
-            boolean flag = manager.simulate(temperature);
+            boolean flag = manager.simulate(naturalEnvironment);
             if (!flag) {
                 message = "Симуляция завершена через " + step + " шагов.";
                 System.out.println(message);

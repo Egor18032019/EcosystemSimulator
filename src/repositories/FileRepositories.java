@@ -3,6 +3,7 @@ package repositories;
 import logging.Logger;
 import models.Animal;
 import models.EcosystemObject;
+import models.NaturalEnvironment;
 import models.Plant;
 
 import java.io.*;
@@ -55,6 +56,12 @@ public class FileRepositories implements RepositoriesCommon {
                     int eating = Integer.parseInt(parts[2].split(": ")[1]);
                     int reproduction = Integer.parseInt(parts[3].split(": ")[1]);
                     objects.add(new Animal(name, population, eating, reproduction));
+                } else if (line.startsWith("NaturalEnvironment")) {
+                    String[] parts = line.split(", ");
+                    int temperature = Integer.parseInt(parts[0].split("=")[1]);
+                    int humidity = Integer.parseInt(parts[1].split("=")[1]);
+                    int waterAvailable = Integer.parseInt(parts[2].split("=")[1].replace("}", ""));
+                    objects.add(new NaturalEnvironment(temperature, humidity, waterAvailable));
                 }
             }
             logger.log("Выгрузили данные симуляции из файла. Всего объектов: " + objects.size());
