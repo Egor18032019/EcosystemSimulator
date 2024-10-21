@@ -12,10 +12,15 @@ import repositories.RepositoriesCommon;
 import java.util.*;
 
 public class EcosystemManager implements ManagerCommon {
+    // разные папки, чтобы хранить отдельно файлы данных растений и животных и условия ?
+    // растения и животные в hashmap ? и по ключу достаем ?
+    // todo как бы три папки и три таблицы
+
     private final List<EcosystemObject> objects;
+
     private final RepositoriesCommon fileRepositories;
-    LoggerCommon logger = Logger.getLogger();
-    NaturalEnvironment naturalEnvironment;
+    private final LoggerCommon logger = Logger.getLogger();
+    private final NaturalEnvironment naturalEnvironment;
 
     public EcosystemManager(String filename) {
         fileRepositories = new FileRepositories(filename);
@@ -123,8 +128,6 @@ public class EcosystemManager implements ManagerCommon {
             logger.log(animal.getName() + " не может расти." + animal.getPopulation());
             return true;
         }
-        // Животные пьют воду по одной единицы на голову.
-        // Рост животных зависит от воды.
         int waterNeeded = animal.getPopulation();
         if (naturalEnvironment.getWaterAvailable() < waterNeeded) {
             String message = "Недостаточно воды для животных " + animal.getName() + ".";
@@ -135,7 +138,6 @@ public class EcosystemManager implements ManagerCommon {
             naturalEnvironment.setWaterAvailable(naturalEnvironment.getWaterAvailable() - animal.getPopulation());
         }
 
-        // оставшиеся едят растение.
         System.out.println("Животным " + animal.getName() + " необходимо " + foodNeeded + " килограмма еды.");
         int foodCount = foodNeeded;
         for (EcosystemObject object : objects) {
@@ -199,7 +201,6 @@ public class EcosystemManager implements ManagerCommon {
 
     @Override
     public void printObjects() {
-        System.out.println(naturalEnvironment.toString());
         for (EcosystemObject obj : objects) {
             System.out.println(obj);
         }

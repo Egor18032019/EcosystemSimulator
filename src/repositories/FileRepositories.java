@@ -5,11 +5,11 @@ import models.Animal;
 import models.EcosystemObject;
 import models.NaturalEnvironment;
 import models.Plant;
+import utils.Const;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class FileRepositories implements RepositoriesCommon {
@@ -17,7 +17,7 @@ public class FileRepositories implements RepositoriesCommon {
     private static final Logger logger = Logger.getLogger();
 
     public FileRepositories(String fileName) {
-        this.FileName = "data/" + fileName + ".txt";
+        this.FileName = Const.DATA_DIRECTORY + fileName + ".txt";
 
     }
 
@@ -46,7 +46,6 @@ public class FileRepositories implements RepositoriesCommon {
                     String[] parts = line.split(", ");
                     String name = parts[0].split(": ")[1];
                     int growthRate = Integer.parseInt(parts[1].split(": ")[1]);
-//                    Plant: 2, Growth Rate: 3, Weight: 3
                     int weight = Integer.parseInt(parts[2].split(": ")[1]);
                     objects.add(new Plant(name, growthRate, weight));
                 } else if (line.startsWith("Animal")) {
@@ -78,7 +77,7 @@ public class FileRepositories implements RepositoriesCommon {
         File file = new File(FileName);
 
         if (!file.exists()) {
-            String message = "Не найден файл для сохранения данных симуляции!";
+            String message = "Не найден файл для сохранения данных симуляции! Будет создан новый.";
             System.out.println(message);
             logger.log(message);
         }
@@ -105,7 +104,6 @@ public class FileRepositories implements RepositoriesCommon {
     public void delete() {
         File fileToDelete = new File(FileName);
 
-        // Проверяем ли то что существует ли файл ?
         if (!fileToDelete.exists()) {
             System.out.println("Файл не найден.");
             logger.log("Файл не найден.");

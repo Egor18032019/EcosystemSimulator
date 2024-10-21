@@ -10,7 +10,7 @@ public class Logger implements LoggerCommon {
     private String FileName;
 
     private Logger() {
-        this.FileName = "data/default.log";
+        this.FileName = Const.DATA_DIRECTORY + "default.log";
     }
 
     public static Logger getLogger() {
