@@ -27,7 +27,7 @@ public class EcosystemManager implements ManagerCommon {
         } else {
             // в аксиоме мы должны быть уверены,  
             //  что самый первый элемент в списке это Условия окружающей среды.
-            naturalEnvironment = (NaturalEnvironment) objects.getFirst();
+            naturalEnvironment = (NaturalEnvironment) objects.get(0);
         }
     }
 

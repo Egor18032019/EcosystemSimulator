@@ -1,15 +1,15 @@
 Не доделал.
 
 # Запуск приложения
-
+* Через командную строку.
 ```shell
-javac  -cp src src/EcosystemSimulator.java
-java -cp src EcosystemSimulator
+javac  -cp src src/EcosystemSimulator.java -d out
+java -cp out EcosystemSimulator
 ```
 
-или выполните скрипт run.sh или run.bat или run.bash
+* или выполните скрипт run.sh или run.bat или run.bash
 
-или через docker
+* или через docker
 ```shell
 docker build -t app .
 docker run -it app
