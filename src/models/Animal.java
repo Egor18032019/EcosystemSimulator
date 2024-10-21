@@ -38,7 +38,8 @@ public class Animal extends EcosystemObject {
 
     public void increasePopulation(int temperature, int water) {
 
-        if (population >= 0) {
+        if (population > 1) {
+
             if (water <= 0) {
                 System.out.println("Недостаточно воды для размножения " + name);
                 logger.log("Недостаточно воды для размножения " + name);
@@ -49,12 +50,24 @@ public class Animal extends EcosystemObject {
                 System.out.println(name + " популяция увеличивается! Population: " + population);
                 logger.log(name + " популяция увеличивается! Population: " + population);
             } else {
+                System.out.println("Неблагоприятные условия для животных.");
+                logger.log("Неблагоприятные условия для животных.");
                 population = population + reproduction / 2;
-                System.out.println(name + " популяция увеличивается! Population: " + population);
-                logger.log(name + " популяция увеличивается! Population: " + population);
+                if (reproduction / 2 != 0) {
+                    String message = name + " популяция смогла вырасти! Population: " + population;
+                    System.out.println(message);
+                    logger.log(message);
+                } else {
+                    System.out.println("Из-за неблагоприятных условий " + name + " не может размножаться");
+                }
             }
 
 
+        } else {
+            if (population == 1) {
+                System.out.println(name + " не может размножаться,т.к. нет пары.");
+                logger.log(name + " не может размножаться,т.к. нет пары.");
+            }
         }
         // а если меньше то и расти нечему
 

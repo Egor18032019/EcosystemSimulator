@@ -1,5 +1,7 @@
 package logging;
 
+import utils.Const;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -17,7 +19,7 @@ public class Logger implements LoggerCommon {
 
     @Override
     public void setFileName(String fileName) {
-        this.FileName = "data/" + fileName + ".log";
+        this.FileName = Const.DATA_DIRECTORY + fileName + ".log";
     }
 
     @Override

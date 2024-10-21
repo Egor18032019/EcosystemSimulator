@@ -1,11 +1,14 @@
 package models;
 
+import logging.Logger;
+import logging.LoggerCommon;
 import utils.Const;
 
 // + растения = имя + скорость роста
 public class Plant extends EcosystemObject {
     private int growthRate;
     private int weight;
+    LoggerCommon logger = Logger.getLogger();
 
     public Plant(String name, int growthRate, int weight) {
         super(name);
@@ -21,8 +24,9 @@ public class Plant extends EcosystemObject {
 
     public void increaseWeight(int humidity) {
         if (weight > 0) {
-            weight = weight + growthRate * humidity;// примерная логика
+            weight = weight + growthRate * humidity / 10;// примерная логика
             System.out.println(name + " растет! Вес составляет " + weight + " кг.");
+            logger.log(name + " растет! Вес составляет " + weight + " кг.");
         }
     }
 
@@ -39,9 +43,11 @@ public class Plant extends EcosystemObject {
             if (humidity >= Const.DEFAULT_HUMIDITY) {
                 weight = weight - growthRate;
                 System.out.println(name + " уменьшается! Вес составляет " + weight + " кг");
+                logger.log(name + " уменьшается! Вес составляет " + weight + " кг");
             } else {
-                weight = weight - growthRate * humidity;
+                weight = weight - growthRate * humidity / 10;
                 System.out.println(name + " уменьшается! Вес составляет " + weight + " кг");
+                logger.log(name + " уменьшается! Вес составляет " + weight + " кг");
             }
         }
     }

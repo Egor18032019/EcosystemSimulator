@@ -7,6 +7,7 @@ import services.EcosystemManager;
 import services.ManagerCommon;
 import utils.Const;
 
+import java.io.File;
 import java.util.Scanner;
 
 public class EcosystemSimulator {
@@ -21,15 +22,16 @@ public class EcosystemSimulator {
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
 
-            System.out.println("1. Добавить растение");
-            System.out.println("2. Добавить животное");
-            System.out.println("3. Показать объекты");
-            System.out.println("4. Ввести температуру окружающей среды");
-            System.out.println("5. Ввести влажность окружающей среды");
-            System.out.println("6. Ввести кол-во доступной воды");
-            System.out.println("7. Запустить симуляцию");
-            System.out.println("0. Выход");
-            //todo добавить  очистить данные
+            System.out.println("1. Добавить растение.");
+            System.out.println("2. Добавить животное.");
+            System.out.println("3. Показать данные симуляции.");
+            System.out.println("4. Ввести температуру окружающей среды.");
+            System.out.println("5. Ввести влажность окружающей среды.");
+            System.out.println("6. Ввести кол-во доступной воды.");
+            System.out.println("7. Запустить симуляцию.");
+            System.out.println("0. Выход.");
+            System.out.println("-1. Очистить данные.");
+
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -75,6 +77,9 @@ public class EcosystemSimulator {
                 case 7:
                     runSimulation(manager, naturalEnvironment, logger);
                     break;
+                case -1:
+                    cleanDataDirectory(logger);
+                    break;
                 default:
                     System.out.println("Неверный выбор. Попробуйте еще раз.");
                     break;
@@ -85,16 +90,11 @@ public class EcosystemSimulator {
     }
 
     private static void runSimulation(ManagerCommon manager, NaturalEnvironment naturalEnvironment, LoggerCommon logger) {
-        String message = "Задали условия теперь запускаем симуляцию в цикле на 10 шагов.";
+        String message = "Задали условия теперь запускаем симуляцию в бесконечном цикле.";
         System.out.println(message);
         logger.log(message);
-        //todo убрать цикл с ограничением на количество шагов
-        //todo добавить влагу которую едят животные и растения = ресурс кончился и все умерли
-        // todo всё заканчивается когда погибли животные и растения => что бы можно было запустить симуляцию с одними растениями(без животных)
-        //
-        for (int step = 1; step <= 10; step++) {
-// в зависимости от температуры изменяем кол-во животных и растений
-//                температурный коэффициент для животных и растений одинаковый или разный ?
+        int step = 1;
+        while (true) {
             message = "Шаг симуляции: " + step;
             logger.log(message);
             boolean flag = manager.simulate(naturalEnvironment);
@@ -104,7 +104,24 @@ public class EcosystemSimulator {
                 logger.log(message);
                 return;
             }
+            step++;
         }
     }
 
+    private static void cleanDataDirectory(LoggerCommon logger) {
+        String message = "Очищаем данные.";
+        System.out.println(message);
+        logger.log(message);
+        File file = new File(Const.DATA_DIRECTORY);
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                for (File f : files) {
+                    if (f.isFile()) {
+                        f.delete();
+                    }
+                }
+            }
+        }
+    }
 }
