@@ -13,7 +13,7 @@ import utils.Const;
 import java.util.*;
 
 public class EcosystemManager implements ManagerCommon {
-    private final Map<String, EcosystemObject> storage;
+    private final Map<String, EcosystemObject> storage;//отдельный класс для хранения объектов ?
     private final RepositoriesCommon fileRepositories;
     private final LoggerCommon logger = Logger.getLogger();
     private final NaturalEnvironment naturalEnvironment;
@@ -51,9 +51,7 @@ public class EcosystemManager implements ManagerCommon {
         boolean isPlantLive = true;
         for (EcosystemObject object : storage.values()) {
             if (object instanceof Plant plant) {
-
                 isPlantLive = simulateForPlant(naturalEnvironment, plant);
-
             } else if (object instanceof Animal animal) {
                 isAnimalLive = simulateForAnimal(naturalEnvironment, animal);
             }
@@ -116,7 +114,6 @@ public class EcosystemManager implements ManagerCommon {
     }
 
     private boolean animalEatFoodAndDrinkWater(int foodNeeded, Animal animal, NaturalEnvironment naturalEnvironment) {
-
         if (animal.getPopulation() <= 0) {
             System.out.println(animal.getName() + " не может расти.При нулевом количестве.");
             logger.log(animal.getName() + " не может расти." + animal.getPopulation());
@@ -178,16 +175,6 @@ public class EcosystemManager implements ManagerCommon {
         for (EcosystemObject object : storage.values()) {
             if (object instanceof Animal) {
                 foodCount = foodCount + ((Animal) object).getHowMuchFoodNeedForThisAnimal();
-            }
-        }
-        return foodCount;
-    }
-
-    private int countFoodAvailable() {
-        int foodCount = 0;
-        for (EcosystemObject object : storage.values()) {
-            if (object instanceof Plant) {
-                foodCount = foodCount + ((Plant) object).getWeight();
             }
         }
         return foodCount;

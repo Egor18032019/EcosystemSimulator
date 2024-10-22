@@ -2,11 +2,10 @@ package models;
 
 import logging.Logger;
 
-//животные = имя + скорость поедания(зависит от температуры?) + скорость размножения(зависит от температуры?)
 public class Animal extends EcosystemObject {
     private int population;
-    private final int eating;// сколько ест за каждый тик
-    private final int reproduction;// сколько размножается за каждый тик
+    private final int eating;
+    private final int reproduction;
     private static final Logger logger = Logger.getLogger();
 
     public Animal(String name, int population, int eating, int reproduction) {
@@ -62,15 +61,12 @@ public class Animal extends EcosystemObject {
                 }
             }
 
-
         } else {
             if (population == 1) {
                 System.out.println(name + " не может размножаться,т.к. нет пары.");
                 logger.log(name + " не может размножаться,т.к. нет пары.");
             }
         }
-        // а если меньше то и расти нечему
-
     }
 
     public int getPopulation() {

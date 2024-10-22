@@ -6,7 +6,7 @@ import utils.Const;
 
 // + растения = имя + скорость роста
 public class Plant extends EcosystemObject {
-    private int growthRate;
+    private final int growthRate;
     private int weight;
     LoggerCommon logger = Logger.getLogger();
 

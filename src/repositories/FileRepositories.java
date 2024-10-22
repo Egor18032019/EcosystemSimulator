@@ -123,6 +123,4 @@ public class FileRepositories implements RepositoriesCommon {
             System.out.println("Ошибка при попытке удаления файла.");
         }
     }
-
-
 }

@@ -29,6 +29,9 @@ public class EcosystemSimulator {
             System.out.println("5. Ввести влажность окружающей среды.");
             System.out.println("6. Ввести кол-во доступной воды.");
             System.out.println("7. Запустить симуляцию.");
+            //чтобы пользователь мог запускать симуляции на основе любых сохраненных данных.
+            // а где он их возьмет?
+            System.out.println("8. Показать сохраненные данные симуляций.");
             System.out.println("0. Выход.");
             System.out.println("-1. Очистить данные.");
 
@@ -77,6 +80,9 @@ public class EcosystemSimulator {
                 case 7:
                     runSimulation(manager, naturalEnvironment, logger);
                     break;
+                case 8:
+                    showSavedSimulation();
+                    break;
                 case -1:
                     cleanDataDirectory(logger);
                     break;
@@ -86,6 +92,25 @@ public class EcosystemSimulator {
             }
 
 
+        }
+    }
+
+    private static void showSavedSimulation() {
+
+        File file = new File(Const.DATA_DIRECTORY);
+        if (file.exists()) {
+            File[] files = file.listFiles();
+            if (files != null) {
+                System.out.println("Список сохраненных симуляций:");
+                for (File f : files) {
+                    if (f.isFile()) {
+                        String name = f.getName();
+                        if (name.endsWith(".txt")) {
+                            System.out.println(name.replace(".txt", ""));
+                        }
+                    }
+                }
+            }
         }
     }
 

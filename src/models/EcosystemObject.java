@@ -1,7 +1,5 @@
 package models;
 
-
-//основа объектов в системе
 public abstract class EcosystemObject {
     protected String name;
 
