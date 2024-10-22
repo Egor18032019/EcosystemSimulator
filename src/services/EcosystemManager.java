@@ -8,16 +8,12 @@ import models.NaturalEnvironment;
 import models.Plant;
 import repositories.FileRepositories;
 import repositories.RepositoriesCommon;
+import utils.Const;
 
 import java.util.*;
 
 public class EcosystemManager implements ManagerCommon {
-    // разные папки, чтобы хранить отдельно файлы данных растений и животных и условия ?
-    // растения и животные в hashmap ? и по ключу достаем ?
-    // todo как бы три папки и три таблицы
-
-    private final List<EcosystemObject> objects;
-
+    private final Map<String, EcosystemObject> storage;
     private final RepositoriesCommon fileRepositories;
     private final LoggerCommon logger = Logger.getLogger();
     private final NaturalEnvironment naturalEnvironment;
@@ -25,14 +21,12 @@ public class EcosystemManager implements ManagerCommon {
     public EcosystemManager(String filename) {
         fileRepositories = new FileRepositories(filename);
 
-        objects = fileRepositories.read();
-        if (objects.isEmpty()) {
+        storage = fileRepositories.read();
+        if (storage.isEmpty()) {
             naturalEnvironment = new NaturalEnvironment();
-            objects.add(naturalEnvironment);
+            storage.put(naturalEnvironment.getName(), naturalEnvironment);
         } else {
-            // в аксиоме мы должны быть уверены,  
-            //  что самый первый элемент в списке это Условия окружающей среды.
-            naturalEnvironment = (NaturalEnvironment) objects.get(0);
+            naturalEnvironment = (NaturalEnvironment) storage.get(Const.ENVIRONMENT_NAME);
         }
     }
 
@@ -42,20 +36,20 @@ public class EcosystemManager implements ManagerCommon {
 
     @Override
     public void update(EcosystemObject object) {
-        objects.add(object);
+        storage.put(object.getName(), object);
         fileRepositories.update(object);
     }
 
     @Override
-    public List<EcosystemObject> getObjects() {
-        return objects;
+    public Map<String, EcosystemObject> getObjects() {
+        return storage;
     }
 
     @Override
     public boolean simulate(NaturalEnvironment naturalEnvironment) {
         boolean isAnimalLive = true;
         boolean isPlantLive = true;
-        for (EcosystemObject object : objects) {
+        for (EcosystemObject object : storage.values()) {
             if (object instanceof Plant plant) {
 
                 isPlantLive = simulateForPlant(naturalEnvironment, plant);
@@ -140,7 +134,7 @@ public class EcosystemManager implements ManagerCommon {
 
         System.out.println("Животным " + animal.getName() + " необходимо " + foodNeeded + " килограмма еды.");
         int foodCount = foodNeeded;
-        for (EcosystemObject object : objects) {
+        for (EcosystemObject object : storage.values()) {
             if (object instanceof Plant) {
                 if (foodCount > 0) {
                     Plant plant = (Plant) object;
@@ -181,7 +175,7 @@ public class EcosystemManager implements ManagerCommon {
 
     private int countFoodNeeded() {
         int foodCount = 0;
-        for (EcosystemObject object : objects) {
+        for (EcosystemObject object : storage.values()) {
             if (object instanceof Animal) {
                 foodCount = foodCount + ((Animal) object).getHowMuchFoodNeedForThisAnimal();
             }
@@ -191,7 +185,7 @@ public class EcosystemManager implements ManagerCommon {
 
     private int countFoodAvailable() {
         int foodCount = 0;
-        for (EcosystemObject object : objects) {
+        for (EcosystemObject object : storage.values()) {
             if (object instanceof Plant) {
                 foodCount = foodCount + ((Plant) object).getWeight();
             }
@@ -201,7 +195,7 @@ public class EcosystemManager implements ManagerCommon {
 
     @Override
     public void printObjects() {
-        for (EcosystemObject obj : objects) {
+        for (EcosystemObject obj : storage.values()) {
             System.out.println(obj);
         }
 
@@ -209,6 +203,6 @@ public class EcosystemManager implements ManagerCommon {
 
     @Override
     public void save() {
-        fileRepositories.create(objects);
+        fileRepositories.create(storage);
     }
 }

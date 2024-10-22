@@ -2,7 +2,7 @@ package models;
 
 import utils.Const;
 
-public class NaturalEnvironment extends EcosystemObject{
+public class NaturalEnvironment extends EcosystemObject {
     // действует на всех
     int temperature;
     // влажность только на растения
@@ -18,7 +18,7 @@ public class NaturalEnvironment extends EcosystemObject{
     }
 
     public NaturalEnvironment(int temperature, int humidity, int waterAvailable) {
-        super("Условия окружающей среды.");
+        super(Const.ENVIRONMENT_NAME);
         this.temperature = temperature;
         this.humidity = humidity;
         this.waterAvailable = waterAvailable;

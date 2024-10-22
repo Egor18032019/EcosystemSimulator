@@ -9,8 +9,8 @@ import utils.Const;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileRepositories implements RepositoriesCommon {
     private final String FileName;
@@ -22,9 +22,9 @@ public class FileRepositories implements RepositoriesCommon {
     }
 
     @Override
-    public void create(List<EcosystemObject> objects) {
+    public void create(Map<String, EcosystemObject> objects) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FileName))) {
-            for (EcosystemObject object : objects) {
+            for (EcosystemObject object : objects.values()) {
                 writer.write(object.toString());
                 writer.newLine();
             }
@@ -37,8 +37,9 @@ public class FileRepositories implements RepositoriesCommon {
     }
 
     @Override
-    public List<EcosystemObject> read() {
-        List<EcosystemObject> objects = new ArrayList<>();
+    public Map<String, EcosystemObject> read() {
+        Map<String, EcosystemObject> storage = new HashMap<>();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(FileName))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -47,29 +48,31 @@ public class FileRepositories implements RepositoriesCommon {
                     String name = parts[0].split(": ")[1];
                     int growthRate = Integer.parseInt(parts[1].split(": ")[1]);
                     int weight = Integer.parseInt(parts[2].split(": ")[1]);
-                    objects.add(new Plant(name, growthRate, weight));
+                    storage.put(name, new Plant(name, growthRate, weight));
                 } else if (line.startsWith("Animal")) {
                     String[] parts = line.split(", ");
                     String name = parts[0].split(": ")[1];
                     int population = Integer.parseInt(parts[1].split(": ")[1]);
                     int eating = Integer.parseInt(parts[2].split(": ")[1]);
                     int reproduction = Integer.parseInt(parts[3].split(": ")[1]);
-                    objects.add(new Animal(name, population, eating, reproduction));
+//                    objects.add(new Animal(name, population, eating, reproduction));
+                    storage.put(name, new Animal(name, population, eating, reproduction));
                 } else if (line.startsWith("NaturalEnvironment")) {
                     String[] parts = line.split(", ");
                     int temperature = Integer.parseInt(parts[0].split("=")[1]);
                     int humidity = Integer.parseInt(parts[1].split("=")[1]);
                     int waterAvailable = Integer.parseInt(parts[2].split("=")[1].replace("}", ""));
-                    objects.add(new NaturalEnvironment(temperature, humidity, waterAvailable));
+                    NaturalEnvironment naturalEnvironment = new NaturalEnvironment(temperature, humidity, waterAvailable);
+                    storage.put(naturalEnvironment.getName(), naturalEnvironment);
                 }
             }
-            logger.log("Выгрузили данные симуляции из файла. Всего объектов: " + objects.size());
+            logger.log("Выгрузили данные симуляции из файла. Всего объектов: " + storage.size());
         } catch (IOException e) {
             String message = "При попытки выгрузки данных симуляции из файла " + FileName + " произошла ошибка " + e.getMessage() + ".";
             logger.log(message);
             logger.log("Будет возращен пустой список данных.");
         }
-        return objects;
+        return storage;
     }
 
     @Override
@@ -94,7 +97,7 @@ public class FileRepositories implements RepositoriesCommon {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    logger.log("Ошибка закрытия файла." + e.getMessage());
                 }
             }
         }

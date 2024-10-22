@@ -3,13 +3,13 @@ package services;
 import models.EcosystemObject;
 import models.NaturalEnvironment;
 
-import java.util.List;
+import java.util.Map;
 
 public interface ManagerCommon {
     void update(EcosystemObject object);
 
 
-    List<EcosystemObject> getObjects();
+    Map<String, EcosystemObject> getObjects();
 
     /**
      * Запуск симуляции.

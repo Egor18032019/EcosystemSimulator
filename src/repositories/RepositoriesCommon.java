@@ -2,15 +2,15 @@ package repositories;
 
 import models.EcosystemObject;
 
-import java.util.List;
+import java.util.Map;
 
 public interface RepositoriesCommon {
 
 
-    void create(List<EcosystemObject> objects);
+    void create(Map<String, EcosystemObject> objects);
 
-    List<EcosystemObject> read();
-
+    Map<String, EcosystemObject> read();
+//    List<EcosystemObject> read();
 
 
     void update(EcosystemObject object);
