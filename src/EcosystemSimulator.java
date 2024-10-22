@@ -21,6 +21,7 @@ public class EcosystemSimulator {
         NaturalEnvironment naturalEnvironment = manager.getNaturalEnvironment();
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
+            System.out.println();
 
             System.out.println("1. Добавить растение.");
             System.out.println("2. Добавить животное.");
@@ -30,7 +31,7 @@ public class EcosystemSimulator {
             System.out.println("6. Ввести кол-во доступной воды.");
             System.out.println("7. Запустить симуляцию.");
             //чтобы пользователь мог запускать симуляции на основе любых сохраненных данных.
-            // а где он их возьмет?
+            // а где он их возьмет?Л
             System.out.println("8. Показать сохраненные данные симуляций.");
             System.out.println("0. Выход.");
             System.out.println("-1. Очистить данные.");

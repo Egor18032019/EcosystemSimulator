@@ -11,8 +11,8 @@ java -cp out EcosystemSimulator
 
 * или через docker
 ```shell
-docker build -t app .
-docker run -it app
+docker build -t es .
+docker run -it es
 ```
 ## Использование
 
