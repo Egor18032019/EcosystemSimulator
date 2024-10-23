@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:8
 COPY . /usr/src/work
 WORKDIR /usr/src/work
 RUN mkdir /usr/src/work/out

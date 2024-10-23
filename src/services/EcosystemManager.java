@@ -50,9 +50,11 @@ public class EcosystemManager implements ManagerCommon {
         boolean isAnimalLive = true;
         boolean isPlantLive = true;
         for (EcosystemObject object : storage.values()) {
-            if (object instanceof Plant plant) {
+            if (object instanceof Plant) {
+                Plant plant = (Plant) object;
                 isPlantLive = simulateForPlant(naturalEnvironment, plant);
-            } else if (object instanceof Animal animal) {
+            } else if (object instanceof Animal) {
+                Animal animal = (Animal) object;
                 isAnimalLive = simulateForAnimal(naturalEnvironment, animal);
             }
         }
