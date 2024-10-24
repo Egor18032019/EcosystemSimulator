@@ -8,7 +8,6 @@ import java.util.Map;
 public interface ManagerCommon {
     void update(EcosystemObject object);
 
-
     Map<String, EcosystemObject> getObjects();
 
     /**
@@ -23,4 +22,6 @@ public interface ManagerCommon {
     void save();
 
     NaturalEnvironment getNaturalEnvironment();
+
+    void cleanStorage();
 }

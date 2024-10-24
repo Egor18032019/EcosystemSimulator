@@ -16,16 +16,17 @@ public class EcosystemManager implements ManagerCommon {
     private final Map<String, EcosystemObject> storage;//отдельный класс для хранения объектов ?
     private final RepositoriesCommon fileRepositories;
     private final LoggerCommon logger = Logger.getLogger();
-    private final NaturalEnvironment naturalEnvironment;
+    private NaturalEnvironment naturalEnvironment;
 
-    public EcosystemManager(String filename) {
+    public EcosystemManager(String filename, boolean init) {
         fileRepositories = new FileRepositories(filename);
-
-        storage = fileRepositories.read();
-        if (storage.isEmpty()) {
+        if (init) {
+            storage = new HashMap<>();
             naturalEnvironment = new NaturalEnvironment();
             storage.put(naturalEnvironment.getName(), naturalEnvironment);
+            fileRepositories.create(storage);
         } else {
+            storage = fileRepositories.read();
             naturalEnvironment = (NaturalEnvironment) storage.get(Const.ENVIRONMENT_NAME);
         }
     }
@@ -35,9 +36,15 @@ public class EcosystemManager implements ManagerCommon {
     }
 
     @Override
+    public void cleanStorage() {
+        storage.clear();
+        naturalEnvironment = new NaturalEnvironment();
+        storage.put(naturalEnvironment.getName(), naturalEnvironment);
+    }
+
+    @Override
     public void update(EcosystemObject object) {
         storage.put(object.getName(), object);
-        fileRepositories.update(object);
     }
 
     @Override
@@ -192,6 +199,7 @@ public class EcosystemManager implements ManagerCommon {
 
     @Override
     public void save() {
-        fileRepositories.create(storage);
+        logger.log("Симуляция завершена.");
+        fileRepositories.save(storage);
     }
 }

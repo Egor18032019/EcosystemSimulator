@@ -123,4 +123,20 @@ public class FileRepositories implements RepositoriesCommon {
             System.out.println("Ошибка при попытке удаления файла.");
         }
     }
+
+    @Override
+    public void save(Map<String, EcosystemObject> storage) {
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FileName))) {
+            for (EcosystemObject object : storage.values()) {
+                writer.write(object.toString());
+                writer.newLine();
+            }
+            logger.log("Сохранили данные симуляции из файла. Всего объектов: " + storage.size());
+        } catch (IOException e) {
+            String message = "При попытке сохранения данных симуляции в файл " + FileName + " произошла ошибка " + e.getMessage() + ".";
+            System.out.println(message);
+            logger.log(message);
+        }
+    }
 }

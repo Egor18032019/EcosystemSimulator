@@ -18,4 +18,5 @@ public interface RepositoriesCommon {
     void delete();
 
 
+    void save(Map<String, EcosystemObject> storage);
 }

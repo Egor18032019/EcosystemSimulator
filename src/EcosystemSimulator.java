@@ -1,3 +1,4 @@
+import views.MenuView;
 import logging.Logger;
 import logging.LoggerCommon;
 import models.Animal;
@@ -8,56 +9,80 @@ import services.ManagerCommon;
 import utils.Const;
 
 import java.io.File;
-import java.util.Scanner;
 
 public class EcosystemSimulator {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Введите имя файла для симуляции:");
-        String filename = scanner.nextLine();
+        MenuView menuView = new MenuView();
         LoggerCommon logger = Logger.getLogger();
-        logger.setFileName(filename);
-        ManagerCommon manager = new EcosystemManager(filename);
-        NaturalEnvironment naturalEnvironment = manager.getNaturalEnvironment();
+
+        ManagerCommon manager = null;
+        NaturalEnvironment naturalEnvironment = null;
+
+        int firstCommand = 0;
+
+        while (firstCommand == 0) {
+            menuView.showMainMenu();
+            logger.log("Показываем главное меню.");
+            int choice = menuView.getUserInputInt();
+            menuView.getUserInputLine();
+
+            switch (choice) {
+                case 1:
+                    firstCommand = 1;
+                    System.out.println("Введите имя файла для симуляции:");
+                    String filename = menuView.getUserInputLine();
+                    logger.setFileName(filename);
+                    manager = new EcosystemManager(filename, true);
+                    naturalEnvironment = manager.getNaturalEnvironment();
+                    break;
+                case 2:
+                    firstCommand = 2;
+                    System.out.println("Введите имя файла для симуляции:");
+                    String filenameOldSimulation = menuView.getUserInputLine();
+                    logger.setFileName(filenameOldSimulation);
+                    manager = new EcosystemManager(filenameOldSimulation, false);
+                    naturalEnvironment = manager.getNaturalEnvironment();
+                    break;
+                case 3:
+                    showSavedSimulation();
+                    break;
+                case -1:
+                    cleanDataDirectory(logger);
+                    break;
+                default:
+                    System.out.println("Неверный выбор. Попробуйте еще раз.");
+                    break;
+            }
+        }
+
+
         while (true) {
             System.out.println("Ведите команду = номеру действия:");
             System.out.println();
-
-            System.out.println("1. Добавить растение.");
-            System.out.println("2. Добавить животное.");
-            System.out.println("3. Показать данные симуляции.");
-            System.out.println("4. Ввести температуру окружающей среды.");
-            System.out.println("5. Ввести влажность окружающей среды.");
-            System.out.println("6. Ввести кол-во доступной воды.");
-            System.out.println("7. Запустить симуляцию.");
-            //чтобы пользователь мог запускать симуляции на основе любых сохраненных данных.
-            // а где он их возьмет?Л
-            System.out.println("8. Показать сохраненные данные симуляций.");
-            System.out.println("0. Выход.");
-            System.out.println("-1. Очистить данные.");
-
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            menuView.showForCreateMenu();
+            logger.log("Показываем меню создания экосистемы.");
+            int choice = menuView.getUserInputInt();
+            menuView.getUserInputLine();
 
             switch (choice) {
                 case 1:
                     System.out.println("Введите имя растения:");
-                    String plantName = scanner.nextLine();
+                    String plantName = menuView.getUserInputLine();
                     System.out.println("Введите скорость роста в виде числа:");
-                    int growthRate = scanner.nextInt();
+                    int growthRate = menuView.getUserInputInt();
                     System.out.println("Введите начальный вес растения:");
-                    int weight = scanner.nextInt();
+                    int weight = menuView.getUserInputInt();
                     manager.update(new Plant(plantName, growthRate, weight));
                     break;
                 case 2:
                     System.out.println("Введите имя животного:");
-                    String animalName = scanner.nextLine();
+                    String animalName = menuView.getUserInputLine();
                     System.out.println("Введите начальную популяцию:");
-                    int population = scanner.nextInt();
+                    int population = menuView.getUserInputInt();
                     System.out.println("Введите сколько ест за каждый тик:");
-                    int eating = scanner.nextInt();
+                    int eating = menuView.getUserInputInt();
                     System.out.println("Введите сколько размножается за каждый тик:");
-                    int reproduction = scanner.nextInt();
+                    int reproduction = menuView.getUserInputInt();
                     manager.update(new Animal(animalName, population, eating, reproduction));
                     break;
                 case 3:
@@ -65,15 +90,18 @@ public class EcosystemSimulator {
                     break;
                 case 4:
                     System.out.println("Введите температуру окружающей среды:");
-                    naturalEnvironment.setTemperature(Integer.parseInt(scanner.nextLine()));
+                    naturalEnvironment.setTemperature(Integer.parseInt(menuView.getUserInputLine()));
+                    manager.update(naturalEnvironment);
                     break;
                 case 5:
                     System.out.println("Введите влажность окружающей среды:");
-                    naturalEnvironment.setHumidity(Integer.parseInt(scanner.nextLine()));
+                    naturalEnvironment.setHumidity(Integer.parseInt(menuView.getUserInputLine()));
+                    manager.update(naturalEnvironment);
                     break;
                 case 6:
                     System.out.println("Введите кол-во доступной воды:");
-                    naturalEnvironment.setWaterAvailable(Integer.parseInt(scanner.nextLine()));
+                    naturalEnvironment.setWaterAvailable(Integer.parseInt(menuView.getUserInputLine()));
+                    manager.update(naturalEnvironment);
                     break;
                 case 0:
                     manager.save();
@@ -81,11 +109,8 @@ public class EcosystemSimulator {
                 case 7:
                     runSimulation(manager, naturalEnvironment, logger);
                     break;
-                case 8:
-                    showSavedSimulation();
-                    break;
                 case -1:
-                    cleanDataDirectory(logger);
+                    manager.cleanStorage();
                     break;
                 default:
                     System.out.println("Неверный выбор. Попробуйте еще раз.");
@@ -115,7 +140,8 @@ public class EcosystemSimulator {
         }
     }
 
-    private static void runSimulation(ManagerCommon manager, NaturalEnvironment naturalEnvironment, LoggerCommon logger) {
+    private static void runSimulation(ManagerCommon manager, NaturalEnvironment naturalEnvironment, LoggerCommon
+            logger) {
         String message = "Задали условия теперь запускаем симуляцию в бесконечном цикле.";
         System.out.println(message);
         logger.log(message);
